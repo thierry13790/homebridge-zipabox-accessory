@@ -1,5 +1,6 @@
 This is a Plugin for [Homebridge](https://github.com/nfarina/homebridge) link to the ZipaBox.
 It is just published to test on local access to a ZipaBox (Zipato TM) through the API possibilities.
+It also can be compatible with connection to the API https://my.zipato.com/zipato-web/v2 (only temperature and switch has been tested)
 
 It's based on many different plugin example that you can find by searching "homebridge-plugin" in all Git repository
 
@@ -65,7 +66,7 @@ I did'nt work with javascript since a few years, so please be comprehensive.
     - [x] Add Async method to connect on Security system
     - [x] Add resync if missing connection > need test
     - [x] Add Async method to get System status
-    - [ ] Add method to set the mode
+    - [x ] Add method to set the mode
     - [ ] Add (or no) the SecuritySystemAlarmType
     - [ ] Add security aspect and code
 1. index.js - Adapt to platform ? >> Version 1.x
@@ -164,7 +165,7 @@ pin | (Optional) : your Pin in Zipato Board to arm or disarm alarm.
 ## List of implemented function
 Device              | type        | Methods
 ------------------- | ----------- | -------
-Switch (default)    | switch      | Get Status - Set On - Set Off - Unavailable
+Switch (default)    | switch      | Get Status - Set On - Set Off - Available
 Light Bulb          | light       | Get Status - Set On - Set Off - Unavailable
 Outlet              | outlet      | Get Status - Set On - Set Off - Unavailable
 Temperature Sensor  | temperature | Get Value - Battery Low Status - Unavailable
