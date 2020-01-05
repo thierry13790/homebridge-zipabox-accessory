@@ -21,7 +21,8 @@ class ZipaAccessory {
 
     /* Default */
     /* assign both log and config to properties on 'this' class so we can use them in other methods */
-    this.log = log;
+	
+	this.log = log;
     this.config = config;
 
     /* Loading all the config of the services */
@@ -29,12 +30,31 @@ class ZipaAccessory {
     this.name = config["name"];// || "-noname-";
     //console.log("Name configured :",this.name)
     this.IP = config["server_ip"]; // Change to server_IP > ! config
-    this.baseURL = "http://"+this.IP+":8080/zipato-web/v2/"; // Local
-    //this.baseURL = "https://my.zipato.com:443/zipato-web/v2/"; // Remote - not tested
-    /* Debug and testValue */
+	
+	/* Debug and testValue */
     this.debug = config["debug"] || false;
-    this.debug && this.log("Debug ?: " + this.debug);
-    this.debug && this.log("URL créée:  " + this.baseURL);
+    this.debug && this.log("Debug = " + this.debug);
+	
+	
+	//* Optional remoteAPI */
+    this.remoteAPI = config["remoteAPI"] || false;
+	
+	if(this.remoteAPI != false && this.remoteAPI != true){
+      this.debug && this.log("Configuration error : remoteAPI fixed to false");
+	  this.remoteAPI = false;
+    }
+	
+	if(this.remoteAPI == true){
+		this.debug && this.log("remoteAPI fixed to true, then API in remote");
+		this.baseURL = "https://my.zipato.com:443/zipato-web/v2/";
+    }
+	else{
+		this.debug && this.log("remoteAPI fixed to false, then API in local");
+		this.baseURL = "http://"+this.IP+":8080/zipato-web/v2/"; 
+    }
+		
+    
+    this.debug && this.log("URL created:  " + this.baseURL);
     this.testValue = config["testValue"] || null;
     if(this.testValue != null)
       this.debug && this.log("Test value fixed by user at ", this.testValue);
@@ -54,14 +74,23 @@ class ZipaAccessory {
       this.debug && this.log("Configuration error : batteryLimit fixed to 0.");
       this.batteryLimit = 0;
     }
+	
     /* Optional noStatus to avoid device request */
     this.noStatus = config["noStatus"] || false;
+	
+	
     if(this.noStatus != false && this.noStatus != true){
       this.debug && this.log("Configuration error : noStatus fixed to false");
+	  this.log("Configuration error : noStatus fixed to false");
       this.noStatus = false;
     }
-    if(this.type == "alarm")
-      this.noStatus = true;
+	
+	
+	this.debug && this.log("Status noStatus : ",this.noStatus);
+	
+	if(this.type == "alarm")
+      this.noStatus = true;	
+	
     /* Optional reverse Value */
     this.reverseValue = config["reverse"] || false;
     if(this.reverseValue != false && this.reverseValue != true){
@@ -191,13 +220,14 @@ class ZipaAccessory {
     }.bind(this))
     .then(function connectSecurityIfNeeded(deviceUUIDorUUID){
       if(this.type == "alarm"){
-        this.debug && this.log("Alarm found after zipa connection > connect to the alarm.")
+        //this.debug && this.log("Alarm found after zipa connection > connect to the alarm.")
         return this.zipabox.initSecurity(this.pin)
         .then(this.zipabox.connectSecurity.bind(this.zipabox));
       }else{
-        return deviceUUID; // same for previous Promise without alarm
+	 	this.debug && this.log("inside else deviceUUID",this.deviceUUID);
+        return this.deviceUUID; // same for previous Promise without alarm
       }
-    }.bind(this))
+    }.bind(this))	 
     .catch(function manageError(error) {
       this.log("Error on connectBox : ",error);
 	    throw new Error(error);
@@ -485,8 +515,8 @@ class ZipaAccessory {
        /* Log to the console the value whenever this function is called */
        this.debug && this.log('calling getOnCharacteristicHandler');
 
-       /* Use this block to eventually force a value for test purpose */
-       // if(this.testValue == true){
+       //* Use this block to eventually force a value for test purpose */
+       //if(this.testValue == true){
        //   callback(null,true);
        //   return;
        // }
@@ -558,7 +588,17 @@ class ZipaAccessory {
           else
             returnedValue = 0;
          }
-         callback(error,returnedValue);
+		
+		 this.debug && this.log("Accessory Value returned by callback (just before callback) :",returnedValue);
+		 
+		 if(returnedValue == "true"){
+			 this.debug && this.log("true");
+             callback(error,true);
+           }else{
+			 this.debug && this.log("false");
+             callback(error,false);
+           }
+		 
        }.bind(this))
        .catch(function manageError(error){
          //this.log("Test Value in manage Error : ",deviceStatus);

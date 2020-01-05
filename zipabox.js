@@ -8,8 +8,8 @@ try {
   console.log('crypto support is disabled!');
 }
 
-// var request = require('request');
-// require('request').debug = true; // Mode Debug
+//var request = require('request');
+//require('request').debug = true; // Mode Debug
 const nodeFetch = require('node-fetch')
 const fetch = require('fetch-cookie')(nodeFetch)
 const myInitGet = { // used for all get fetch command
@@ -26,7 +26,7 @@ class Zipabox{
     this.baseURL = url;
     this.log = log;
     this.user = user;
-    this.password = password;
+    this.password = password;	
     //this.cookieJar = request.jar(); // Create a new jar Cookie
     //this.zipaRequest = request.defaults({jar: this.cookieJar});
     this.debug && this.log("Zipabox lien : " + this.baseURL);
@@ -36,6 +36,8 @@ class Zipabox{
     // Init the connection to get the nonce (chain through a Promise)
     return new Promise(function(resolve, reject) {
       this.debug && this.log("Methode initUser()");
+      this.debug && this.log("User :",this.user);
+      this.debug && this.log("Password :",this.password);  
       this.debug && this.log("URL pour init : " + this.baseURL +'user/init');
       fetch(this.baseURL +'user/init', myInitGet)
       .then(fstatus)
@@ -46,7 +48,7 @@ class Zipabox{
         });//end promise
       })// end function fgetNonce
       .then(function resolveTheNonce(nonce){
-        console.log("Resolve the Nonce",nonce)
+        //console.log("Resolve the Nonce",nonce)
         resolve(nonce);
       })
       .catch(function manageError(error) {
@@ -73,7 +75,7 @@ class Zipabox{
       .then(fjson)
       .then(function giveResult(jsonReponse){
         //console.log("Result connectUser",jsonReponse);
-        //console.log("Connection to the Zipabox : ",jsonReponse.success);
+        console.log("Connection to the Zipabox : ",jsonReponse.success);
         resolve(jsonReponse.success);
       })
       .catch(function manageError(error) {
@@ -141,16 +143,16 @@ class Zipabox{
     return new Promise(function(resolve, reject){
       var attributeRequest = '?network=false&device=true&endpoint=false&clusterEndpoint=false&definition=false&config=false&room=false&icons=false&value=false&parent=false&children=false&full=false&type=false';
       this.debug && this.log("Methode getDeviceUUID()");
-      //this.debug && this.log("URL device :",this.baseURL + 'attributes/' + attributeUUID + attributeRequest);
+      // this.debug && this.log("URL device :",this.baseURL + 'attributes/' + attributeUUID + attributeRequest);
       // Check if uuid is a device or not
         // TODO ADD CHECK METHOD
       // Get the id with fetch
-      fetch(this.baseURL + 'attributes/' + attributeUUID + attributeRequest,myInitGet)
+      fetch(this.baseURL + 'attributes/' + attributeUUID + attributeRequest,myInitGet)	   
       .then(fstatus)
       .then(fjson)
       .then(function giveDeviceUUID(jsonResponse){
-        console.log("Response of getDeviceUUID. UUID source :", attributeUUID);
-        console.log("Device UUID : ",jsonResponse.device.uuid);
+        this.debug && this.log("Response of getDeviceUUID. UUID source :", attributeUUID);
+        this.debug && this.log("Device UUID : ",jsonResponse.device.uuid);
         resolve(jsonResponse.device.uuid);
       }.bind(this))
       .catch(function manageError(error) {
@@ -183,6 +185,7 @@ class Zipabox{
   // } // end getDeviceName
 
   getDeviceStatus(uuidDevice,noStatus){ // Return the device Status
+    
     if(noStatus){ //config say that no device is available > return true
       return new Promise(function(resolve,reject){
         resolve(true);
@@ -190,13 +193,15 @@ class Zipabox{
     }else{
       return new Promise(function(resolve, reject) {
         this.debug && this.log("Methode getDeviceStatus()");
+		this.debug && this.log("UUID Device =",uuidDevice);
+		// this.debug && this.log("Url =",this.baseURL + 'devices/' + uuidDevice + '/status',myInitGet);
         fetch(this.baseURL + 'devices/' + uuidDevice + '/status',myInitGet)
         .then(fstatus)
         .then(fjson)
         .then(function returnDeviceStatus(jsonResponse){
-          console.log("Response of getDeviceStatus :", uuidDevice);
-          console.log("Device status :",jsonResponse.state.online);
-          resolve(jsonResponse.state.online);
+		  //console.log("jsonResponse :", jsonResponse);
+          //console.log("Device status :",jsonResponse.online);		  
+          resolve(jsonResponse.online);
         })
         .catch(function manageError(error) {
           console.log('Error occurred!', error);// TODO ADD gestion Error
@@ -231,9 +236,8 @@ class Zipabox{
       fetch(this.baseURL + 'attributes/' + uuidAttributes + '/value',myInitGet)
       .then(fstatus)
       .then(fjson)
-      .then(function returnDeviceStatus(jsonResponse){
-        console.log("Response of getAttributesValue :", uuidAttributes);
-        console.log("Response :",jsonResponse.value);
+      .then(function returnDeviceStatus(jsonResponse){ // faux         
+        //console.log("For ",uuidAttributes," Response of getAttributesValue which is returned by DeviceStatus:",jsonResponse.value);
         resolve(jsonResponse.value);
       })
       .catch(function manageError(error) {
@@ -316,7 +320,7 @@ class Zipabox{
 /* Functions used with fetch. f____ */
 function fstatus(response){
   return new Promise(function(resolve,reject){
-    console.log("In fstatus", response.status);
+    // console.log("In fstatus", response.status);
     // Check the status
     if (response.status >= 200 && response.status < 300) {
       // Go to the next point
