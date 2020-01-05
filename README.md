@@ -1,5 +1,6 @@
 This is a Plugin for [Homebridge](https://github.com/nfarina/homebridge) link to the ZipaBox.
 It is just published to test on local access to a ZipaBox (Zipato TM) through the API possibilities.
+It also can be compatible with connection to the API https://my.zipato.com/zipato-web/v2 (only temperature and switch has been tested).
 
 It's based on many different plugin example that you can find by searching "homebridge-plugin" in all Git repository
 
@@ -7,9 +8,10 @@ The approach is to add multiple accessory and get the base information and actio
 
 The plugin will be adapted to a Platform after programming all the accessory separately (see development route below).
 
-The plugin didn't use the [Zipato API](https://github.com/espenmjos/zipato) (no success after a few try) like the [homebridge-zipato](https://github.com/lrozema/homebridge-zipato) plugin. The actual plugin is an alternative.
+This plugin is compatible with Zipato API that can be found at adress : https://my.zipato.com/zipato-web/api/
+It's also compatible with usage of local API. Using config.json you can select which configuration to use through parameter "remoteAPI".
 
-I did'nt work with javascript since a few years, so please be comprehensive.
+I didn't worked with javascript since a few years, so please be comprehensive.
 
 ## Development route
 1. NPM diffusion
@@ -65,7 +67,7 @@ I did'nt work with javascript since a few years, so please be comprehensive.
     - [x] Add Async method to connect on Security system
     - [x] Add resync if missing connection > need test
     - [x] Add Async method to get System status
-    - [ ] Add method to set the mode
+    - [x ] Add method to set the mode
     - [ ] Add (or no) the SecuritySystemAlarmType
     - [ ] Add security aspect and code
 1. index.js - Adapt to platform ? >> Version 1.x
@@ -89,7 +91,7 @@ I did'nt work with javascript since a few years, so please be comprehensive.
 - [ ] Check lux scale if correct
 - [ ] Defense prog if batteryLevel requested without battery available ?
 - [ ] Get name with name device ? > first test no concluded > do we need ?
-- [ ] Adapt to non local access > if requested
+- [x] Adapt to non local access
 - [ ] Adapt from accessory to platform > check if need (actual multiple connection)
 - [ ] Implementation of Outlet In Use Status > if needed
 - [ ] Add Smoke Sensor > if needed
@@ -107,6 +109,7 @@ Simple example
 "accessories": [
         {
           "accessory": "ZipaAccessory",
+          "remoteAPI": true,
           "type": "switch",
           "name": "MyZipaSwitch",
           "USERNAME": "yourUserName",
@@ -122,6 +125,7 @@ Full example
 "accessories": [
         {
           "accessory": "ZipaAccessory",
+          "remoteAPI": true,
           "type": "switch",
           "name": "MyZipaSwitch",
           "USERNAME": "yourUserName",
@@ -144,6 +148,7 @@ Full example
 Parameter | Remarks
 --------- | -------
 accessory | MUST be ZipaAccessory, will say at Homebridge to use the good plugin
+remoteAPI | Must be true or false depending if API Zipato is use in remote or in local
 type | Select the Accessory Type. switch (default) -others see below-
 name | Name of your plugin, will be displayed in HomeKit (muss be unique)
 USERNAME | Username use to connect to my.zipato.com
@@ -164,7 +169,7 @@ pin | (Optional) : your Pin in Zipato Board to arm or disarm alarm.
 ## List of implemented function
 Device              | type        | Methods
 ------------------- | ----------- | -------
-Switch (default)    | switch      | Get Status - Set On - Set Off - Unavailable
+Switch (default)    | switch      | Get Status - Set On - Set Off - Available
 Light Bulb          | light       | Get Status - Set On - Set Off - Unavailable
 Outlet              | outlet      | Get Status - Set On - Set Off - Unavailable
 Temperature Sensor  | temperature | Get Value - Battery Low Status - Unavailable
