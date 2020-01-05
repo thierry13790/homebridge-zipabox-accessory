@@ -595,10 +595,15 @@ class ZipaAccessory {
 			 this.debug && this.log("true");
              callback(error,true);
            }else{
-			 this.debug && this.log("false");
-             callback(error,false);
+			   if(returnedValue == "false"){
+					this.debug && this.log("false");
+					callback(error,false);
+			   }
+			   else
+				   callback(error,returnedValue);
+				   
            }
-		 
+		   
        }.bind(this))
        .catch(function manageError(error){
          //this.log("Test Value in manage Error : ",deviceStatus);
